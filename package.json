@@ -1,0 +1,33 @@
+{
+  "author": "Tom Wilson <tom@jackhq.com>",
+  "name": "freeway",
+  "description": "Proxy with Admin Panel",
+  "version": "0.0.1",
+  "repository": {
+    "url": ""
+  },
+  "bin": {
+    "freeway": "./bin/freeway"
+  },
+  "scripts": {
+    "test": "mocha"
+  },
+  "engines": {
+    "node": "0.6 || 0.7"
+  },
+  "dependencies": {
+    "bouncy": "*",
+    "flatiron": "*",
+    "union": "*",
+    "nano": "*",
+    "ecstatic": "*",
+    "creamer": "0.2.0"
+  },
+  "devDependencies": {
+    "coffee-script": "*",
+    "should": "*",
+    "mocha": "*",
+    "request": "*",
+    "zombie": "*"
+  }
+}

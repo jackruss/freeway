@@ -1,0 +1,9 @@
+{
+  "proxy": 4000,
+  "web": {
+    "port": 8000,
+    "user": "admin",
+    "password": "admin"
+  },
+  "db": "http://localhost:5498"
+}
