@@ -23,7 +23,7 @@ module.exports = ->
             div '.hero-unit', ->
               h2 'Freeway'
               p 'Proxy and Reverse Proxy'
-            if @user?
+            if @routes?
               div '.addroute', ->
                 hr()
                 h3 'Add Route'
