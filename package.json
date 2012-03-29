@@ -21,7 +21,8 @@
     "union": "*",
     "nano": "*",
     "ecstatic": "*",
-    "creamer": "0.2.0"
+    "creamer": "*",
+    "connect": "*"
   },
   "devDependencies": {
     "coffee-script": "*",

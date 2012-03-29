@@ -1,58 +1,37 @@
 flatiron = require 'flatiron'
 ecstatic = require 'ecstatic'
 creamer = require 'creamer'
+connect = require 'connect'
+auth = require __dirname + '/middleware/auth'
+
 
 module.exports = (port) ->
   app = flatiron.app
   app.use flatiron.plugins.http
-  app.use creamer, layout: ->
-    doctype 5
-    html ->
-      head ->
-        meta charset: 'utf-8'
-        title 'Freeway Admin'
-        link rel: 'stylesheet', href: '/css/bootstrap.min.css'
-        link rel: 'stylesheet', href: '/css/bootstrap-responsive.min.css'
-        link rel: 'stylesheet', href: '/css/app.css'
-      body 'data-spy': 'scroll', 'data-target': '.subnav', 'data-offset': '50', ->
-        div '.navbar.navbar-fixed-top', ->
-          div '.navbar-inner',  ->
-            div '.container', ->
-              a '.brand', href: '/', 'Freeway'
-              div '.nav-collapse', ->
-                ul '.nav', ->
-                  li -> a href: '/', 'Rules'
-                  li -> a href: '/config', 'Config'
-        div '.container', ->
-          div '.row-fluid', ->
-            div '.span8', -> content()
-            div '.span4', ->
-              div '.hero-unit', ->
-                h2 'Freeway'
-                p 'Proxy and Reverse Proxy'
-                hr()
-                h3 'Add Route'
-                #p 'Add a route to freeway, the host represents the incoming host name and will be used to key the proxy.  The url or ip and port is the destination of the request.  Lastly, the token will enforce the sender to add X-token to their header.'
-                div ->
-                  form action: '/routes', method: 'POST', ->
-                    textField 'host'
-                    fieldset ->
-                      textField 'target', placeholder: '(url or ip:port)'
-                    textField 'token'
-                    p '.help-block', 'Token will enforce callee to pass X-token header of this value'
-                    button '.btn.btn-primary.btn-large', 'Add Route'
 
-        script src: 'http://cdnjs.cloudflare.com/ajax/libs/jquery/1.7.1/jquery.min.js'
-        script src: '/js/bootstrap.min.js'
+  app.use creamer, 
+    views: __dirname + '/views'
+    layout: require __dirname + '/views/layout'
 
   app.http.before = [
-      ecstatic __dirname + '/../public', autoIndex: off, cache: on
+      ecstatic __dirname + '/../public', { autoIndex: off, cache: on }
+      connect.cookieParser()
+      connect.session secret: 'It is a lovely day for a long walk in the park'
+      auth exclude: ['login','sessions']
+      # ( (options) ->
+      #   (req, res, next) ->
+      #     path = req.url.split('/').pop()
+      #     excludes = options.exclude or []
+      #     if req.session.user or excludes.indexOf(path) > -1 
+      #      next()
+      #     else
+      #      req.session.referrer = req.originalUrl
+      #      res.writeHead 303, Location: '/login'
+      #      res.end()
+      # )(exclude: ['login','sessions'])
   ]
 
-  app.router.get '/', ->
-    @res.writeHead 303, Location: '/login'
-    @res.end()
-
+  #app.router.get '/', -> @res.html app.bind -> h1 'Hello World'
   app.router.get '/', -> @res.html app.bind -> 
     div 'row', ->
       div '.well', ->
@@ -80,6 +59,23 @@ module.exports = (port) ->
         passwordField 'password'
         p ->
           button '.btn.btn-primary.btn-large', 'Login'
+  app.router.get '/logout', -> 
+    @req.session.destroy (err) =>
+      console.log err 
+      @res.writeHead 303, Location: '/login'
+      @res.end()
+
+  app.router.post '/sessions', -> 
+    @req.session.user = @req.body.user
+    @req.session.maxAge = (((60 * 1000) * 60) * 24)
+    @req.session.save()
+
+    dest = @req.session.referrer
+    @req.session.referrer = null
+
+    @res.writeHead 303, Location: '/'
+    @res.end()
+
   app.start(port)
 
 
