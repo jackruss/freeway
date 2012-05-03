@@ -2,7 +2,7 @@
   "author": "Tom Wilson <tom@jackhq.com>",
   "name": "freeway",
   "description": "Proxy with Admin Panel",
-  "version": "0.0.1",
+  "version": "1.0.0-alpha",
   "repository": {
     "url": ""
   },
@@ -16,13 +16,8 @@
     "node": "0.6 || 0.7"
   },
   "dependencies": {
-    "bouncy": "*",
-    "flatiron": "git://github.com/twilson63/flatiron.git",
-    "union": "*",
-    "nano": "*",
-    "ecstatic": "*",
-    "creamer": "*",
-    "connect": "*",
+    "bouncy": "~1.3.1",
+    "nano": "~2.0.0",
     "nconf": "~0.5.1",
     "follow": "~0.8.0"
   },
@@ -30,7 +25,6 @@
     "coffee-script": "*",
     "should": "*",
     "mocha": "*",
-    "request": "*",
-    "zombie": "*"
+    "request": "*"
   }
 }

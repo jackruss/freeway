@@ -1,18 +1,13 @@
 # Freeway
 
-A wrapper around bouncy to build a two way proxy so that vendors can connect
-to our cloud via one ip address.
+A 2-way proxy server
 
-## Why
-
-To provide a single ip for external interfacing vendors for incoming
-requests and outgoing requests.  Freeway can be configured to proxy
-secure requests from one datacenter to dynamic load balancers that can
-route to platform as a service applications in multiple datacenters.
+* proxy server
+* reverse proxy server
 
 ## About
 
-Freeway uses a simple couchdb for its configuration setup, this couchdb can be
+Freeway uses a couchdb for its configuration setup, this couchdb can be
 configured by passing env params or by setting up a config.json file in the root 
 of the application.  The config takes two keys, (uri and db)
 
@@ -50,7 +45,7 @@ npm install freeway -g
 
 ## Usage
 
-create config json file - freeway.json
+create config json file - config.json
 
 ``` js
 {
@@ -62,6 +57,6 @@ create config json file - freeway.json
 ```
 
 ``` sh
-freeway
+freeway 8080
 ```
 
