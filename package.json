@@ -17,12 +17,14 @@
   },
   "dependencies": {
     "bouncy": "*",
-    "flatiron": "*",
+    "flatiron": "git://github.com/twilson63/flatiron.git",
     "union": "*",
     "nano": "*",
     "ecstatic": "*",
     "creamer": "*",
-    "connect": "*"
+    "connect": "*",
+    "nconf": "~0.5.1",
+    "follow": "~0.8.0"
   },
   "devDependencies": {
     "coffee-script": "*",

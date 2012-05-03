@@ -1,2 +1,1 @@
-var web = require('./lib/web')
-web(8000)
+var proxy = require('./lib/proxy')
