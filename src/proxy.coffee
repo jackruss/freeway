@@ -3,7 +3,7 @@ nconf = require 'nconf'
 follow = require 'follow'
 #utile = require('utile')
 nconf.env().file(file: "#{__dirname}/config.json")
-db = [nconf.get 'datastore:uri'), nconf.get 'datastore:db')].join('/')
+db = [nconf.get('datastore:uri'), nconf.get('datastore:db')].join('/')
 freeway = require('nano')(db)
 follow = require('follow')
 
@@ -40,4 +40,8 @@ follow db: db, include_docs: true, (e, change) ->
 module.exports = (cb) ->
   bouncy opts, (req, bounce) -> 
     rule = rules[req.headers.host]
-    bounce rule.ip, rule.port if rule?
+    if rule?
+      return if rule.token? and rule.token != req.headers.token
+      # bounce to destination
+      bounce rule.ip, rule.port
+      
