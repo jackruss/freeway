@@ -12,7 +12,7 @@ describe 'proxy', ->
     it 'should bounce to localhost:3000', (done) ->
       config =
         "port": 4000
-      server = proxy(db: 'http://localhost:5498')
+      server = proxy()
       server.listen config.port
       request 'http://localhost:4000/hello', (e, r, b) ->
         b.should.equal 'world'
