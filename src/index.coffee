@@ -7,7 +7,7 @@ db = nconf.get('datastore')
 freeway = require('nano')(db)
 follow = require('follow')
 
-nconf.set 'default', "https://iis-dev.eirenerx.com"
+nconf.set 'default', "https://localhost:9000"
 
 updateSettings =(settings) ->
   nconf.set 'opts', { key: settings.key, cert: settings.cert }
