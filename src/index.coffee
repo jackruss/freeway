@@ -3,22 +3,18 @@ nconf = require 'nconf'
 follow = require 'follow'
 nconf.env().file(file: "./config.json")
 
-db = [nconf.get('datastore:uri'), nconf.get('datastore:db')].join('/')
+db = nconf.get('datastore')
 freeway = require('nano')(db)
 follow = require('follow')
 
-tokens = {}
-opts = {}
-default = "https://iis-dev.eirenerx.com"
+nconf.set 'default', "https://iis-dev.eirenerx.com"
 
 updateSettings =(settings) ->
-  opts = { settings.key, settings.cert }
-  tokens = settings.tokens
-  default = settings.default
-  # emit update settings
+  nconf.set 'opts', { key: settings.key, cert: settings.cert }
+  nconf.set 'tokens', settings.tokens
+  nconf.set 'default', settings.default if settings.default?
+  console.log 'Updated Settings from CouchDb.....'
 
-# # function loadRules
-#
 # pulls rules from couchdb config datastore
 freeway.get 'settings', (e,doc) => 
   return console.error e if e
@@ -31,11 +27,11 @@ follow db: db, include_docs: true, (e, change) =>
 
 # if xtoken allow bouce to occur based on host header, otherwise bounce to default
 module.exports = (port) ->
-  
-  server = bouncy opts, (req, bounce) =>
+  server = bouncy nconf.get('opts'), (req, bounce) =>
     xtoken = req.headers['x-token']
-    target = default # set to default target
-    target = if xtoken? and tokens.indexOf(xtoken) >= 0 then req.headers.host
+    target = nconf.get('default') # set to default target
+    if xtoken? and nconf.get('tokens').indexOf(xtoken) >= 0
+      target = req.headers.host
     bounce target
   
   server.on "error", (err) -> console.error err.message

@@ -1,41 +1,20 @@
 # Freeway
 
-A 2-way proxy server
+A reverse proxy webserver
 
-* proxy server
-* reverse proxy server
+Freeway has the following configuration settings that are stored in a couchdb document called
+settings.  
 
-## About
-
-Freeway uses a couchdb for its configuration setup, this couchdb can be
-configured by passing env params or by setting up a config.json file in the root 
-of the application.  The config takes two keys, (uri and db)
-
-Example Config
-
-``` javascript
+```
 {
-  "datastore": {
-    "uri": "http://localhost:5984",
-    "db": "freeway"
-  }
+  "default": "http://internal.server.com", // your internal servers or load balancers
+  "tokens": ["foo", "bar", "baz"]
 }
 ```
 
-Once a connection is made, freeway is going to look for two documents in the database.
-
-1. opts
-2. rules
-
-The `opts` document contains any options you would like to pass to bouncy, for example SSL info to configure as a ssl terminator.
-
-The `rules` document contains keys that define how the system will bounce per host match.
-
-When a request comes into `freeway`, `freeway` will examine the headers `host` key to match against a key in the rules document, if a match is found then it will grab the value object of that key, which contains the url and port to execute the bounce for.
-
-### Token Filter
-
-Freeway has a feature that enables you to configure a `token` that can be validated to confirm that the proxy should perform the bounce.  If the `token` key is not set, it will always bounce, if it is set then freeway will validate the token before bouncing.
+Any request that comes into the server without a token in the header that matches the
+configured tokens will bounce to the default server.  Any request that comes into the
+server with a matching token will bounce to the host header in the request.
 
 ## Install
 
@@ -49,14 +28,15 @@ create config json file - config.json
 
 ``` js
 {
-  "datastore": {
-    "uri": "http://localhost:5984",
-    "db": "freeway"
-  }
+  "datastore": "http://localhost:5984/freeway"
 }
 ```
 
 ``` sh
 freeway 8080
 ```
+
+## Logging 
+
+All logs are currently going to stdout, if you use forever you can also configure this.
 

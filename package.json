@@ -1,7 +1,7 @@
 {
   "author": "Tom Wilson <tom@jackhq.com>",
   "name": "freeway",
-  "description": "Proxy with Admin Panel",
+  "description": "Reverse Proxy Server",
   "version": "1.0.0-alpha1",
   "repository": {
     "url": ""
