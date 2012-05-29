@@ -1,49 +1,42 @@
 bouncy = require 'bouncy'
 nconf = require 'nconf'
 follow = require 'follow'
-#utile = require('utile')
 nconf.env().file(file: "./config.json")
 
 db = [nconf.get('datastore:uri'), nconf.get('datastore:db')].join('/')
 freeway = require('nano')(db)
 follow = require('follow')
 
-rules = {}
+tokens = {}
 opts = {}
+default = "https://iis-dev.eirenerx.com"
+
+updateSettings =(settings) ->
+  opts = { settings.key, settings.cert }
+  tokens = settings.tokens
+  default = settings.default
+  # emit update settings
 
 # # function loadRules
 #
 # pulls rules from couchdb config datastore
-freeway.get 'rules', (e,doc) => 
+freeway.get 'settings', (e,doc) => 
   return console.error e if e
-  rules = doc
-  console.log new Date() + ' - LOADED RULES'
-# # function loadOpts
-#
-# pulls bouncy options from couchdb datastore
-freeway.get 'opts', (e,doc) => 
-  return console.error e if e
-  opts = doc
-  console.log new Date() + ' - LOADED OPTIONS'
+  updateSettings(doc)
 
 # follow changes
 follow db: db, include_docs: true, (e, change) =>
   return console.error e if e
-  rules = change.doc
+  updateSettings(change.doc)
 
-# proxy is driven by rules in config and dynamically
+# if xtoken allow bouce to occur based on host header, otherwise bounce to default
 module.exports = (port) ->
+  
   server = bouncy opts, (req, bounce) =>
-    console.log rules 
-    rule = rules[req.headers.host]
-    if rule?
-      # if token is configured the validate
-      return if rule.token? and rule.token != req.headers['x-token']
-      # bounce to destination
-      if rule.url?
-        bounce rule.url
-      else
-        bounce rule.ip, rule.port
-
-      console.log new Date() + ' - bounced to ' + JSON.stringify(rule)
+    xtoken = req.headers['x-token']
+    target = default # set to default target
+    target = if xtoken? and tokens.indexOf(xtoken) >= 0 then req.headers.host
+    bounce target
+  
+  server.on "error", (err) -> console.error err.message
   server.listen port

@@ -2,7 +2,7 @@
   "author": "Tom Wilson <tom@jackhq.com>",
   "name": "freeway",
   "description": "Proxy with Admin Panel",
-  "version": "1.0.0-alpha",
+  "version": "1.0.0-alpha1",
   "repository": {
     "url": ""
   },
