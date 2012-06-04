@@ -9,7 +9,7 @@ follow = require('follow')
 
 nconf.set 'default', "https://localhost:9000"
 
-updateSettings =(settings) ->
+updateSettings = (settings) ->
   nconf.set 'opts', { key: settings.key, cert: settings.cert }
   nconf.set 'tokens', settings.tokens
   nconf.set 'default', settings.default if settings.default?
@@ -18,15 +18,17 @@ updateSettings =(settings) ->
 # pulls rules from couchdb config datastore
 freeway.get 'settings', (e,doc) => 
   return console.error e if e
-  updateSettings(doc)
+  updateSettings(doc) if doc._id == 'settings'
 
 # follow changes
 follow db: db, include_docs: true, (e, change) =>
   return console.error e if e
+  
   updateSettings(change.doc)
 
 # if xtoken allow bouce to occur based on host header, otherwise bounce to default
 module.exports = (port) ->
+  # this may be buggy if settings are not set before bouncy is called.
   server = bouncy nconf.get('opts'), (req, bounce) =>
     xtoken = req.headers['x-token']
     target = nconf.get('default') # set to default target
