@@ -37,12 +37,12 @@ start = (port) ->
 # get core settings
 freeway.get 'settings', (e,doc) => 
   return log e if e
-  updateSettings(doc) if doc._id == 'settings'
+  updateSettings(doc)
 
 # follow changes
 follow db: db, include_docs: true, (e, change) =>
   return log e if e
-  updateSettings(change.doc)
+  updateSettings(change.doc) if doc._id == 'settings'
 
 pin.on 'getKEY', ->
   # setup certs
