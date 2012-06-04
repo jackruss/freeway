@@ -4,7 +4,7 @@
   "description": "Reverse Proxy Server",
   "version": "1.0.0-alpha3",
   "repository": {
-    "url": ""
+    "url": "https://github.com/jackruss/freeway.git"
   },
   "bin": {
     "freeway": "./bin/freeway"
@@ -27,5 +27,7 @@
     "should": "*",
     "mocha": "*",
     "request": "*"
-  }
+  },
+  "optionalDependencies": {},
+  "homepage": "https://github.com/jackruss/freeway"
 }
