@@ -29,7 +29,7 @@ start = (port) ->
       bounce target
     catch err
       console.log err.message
-      bounce 'http://www.eirenerx.com'
+      bounce 'http://google.com'
 
   server.on "error", (err) -> console.error err.message
   server.listen port
