@@ -12,8 +12,9 @@ opts = {}
 
 nconf.set 'default', "https://localhost:9000"
 
-updateSettings = (settings) ->
-  if settings?
+updateSettings = ->
+  freeway.get 'settings', (e,settings) => 
+    return log e if e
     nconf.set 'tokens', settings.tokens
     nconf.set 'default', settings.default if settings.default?
     log 'Updated Settings from CouchDb.....'
@@ -23,26 +24,25 @@ start = (port) ->
   server = bouncy opts, (req, bounce) =>
     xtoken = req.headers['x-token']
     target = nconf.get('default') # set to default target
-    if xtoken? and nconf.get('tokens').indexOf(xtoken) >= 0
-      target = req.headers.host
+    if xtoken? and nconf.get('tokens').indexOf(xtoken) >= 0 then target = req.headers.host
+    
+    log "Bounced to #{target} on #{(new Date()).toString()}"
     try
       bounce target
     catch err
-      console.log err.message
+      log err.message
       bounce 'http://google.com'
 
-  server.on "error", (err) -> console.error err.message
+  server.on "error", (err) -> log err.message
   server.listen port
 
 # get core settings
-freeway.get 'settings', (e,doc) => 
-  return log e if e
-  updateSettings(doc)
+updateSettings()
 
 # follow changes
-follow db: db, include_docs: true, (e, change) =>
+follow { db: db }, (e, change) =>
   return log e if e
-  updateSettings(change.doc) if doc._id == 'settings'
+  updateSettings() if change.id == 'settings'
 
 pin.on 'getKEY', ->
   # setup certs
