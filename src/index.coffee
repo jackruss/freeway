@@ -60,5 +60,5 @@ module.exports = (port) ->
   updateSettings()
   pin.once 'settings:loaded', ->
     pin.emit 'getKEY'
-    log 'Welcome to Freeway v 1.0.0alpha4'
+    log 'Welcome to Freeway v 1.0.0alpha6'
     log 'Initializing...'
