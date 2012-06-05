@@ -11,8 +11,6 @@ freeway = require('nano')(db)
 follow = require('follow')
 opts = {}
 
-nconf.set 'default', "https://localhost:9000"
-
 updateSettings = ->
   freeway.get 'settings', (e,settings) => 
     return log e if e
@@ -21,30 +19,19 @@ updateSettings = ->
     pin.emit 'settings:loaded'
     log 'Updated Settings from CouchDb.....'
 
-start = (port, port2) ->
+start = (port) ->
   # this may be buggy if settings are not set before bouncy is called.
-  
-  # INBOUND
-  thing1 = bouncy opts, (req, bounce) =>
+  server = bouncy opts, (req, bounce) =>
     target = nconf.get('default') # set to default target
-
-    log "Bounced to #{target} on #{(new Date()).toString()}"
-    bounce target
-
-  thing1.on "error", (err) -> log err.message
-  thing1.listen port
-
-  # OUTBOUND
-  thing2 = bouncy (req, bounce) =>
-    target = 'https://www.google.com'
     xtoken = req?.headers['x-token']
     if xtoken? and nconf.get('tokens').indexOf(xtoken) >= 0 
       target = req.headers?.host
+
     log "Bounced to #{target} on #{(new Date()).toString()}"
     bounce target
 
-  thing2.on "error", (err) -> log err.message
-  thing2.listen port2
+  server.on "error", (err) -> log err.message
+  server.listen port
 
 # follow changes
 follow { db: db }, (e, change) =>
@@ -65,7 +52,7 @@ pin.on 'getCERT', ->
     opts.cert = cert.toString()
     pin.emit 'LOADED', null
 
-module.exports = (port, port2) ->
+module.exports = (port) ->
   pin.once 'LOADED', (err) -> 
     log "Starting server on port #{port}..."
     start port
