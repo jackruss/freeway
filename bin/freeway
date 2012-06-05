@@ -1,2 +1,2 @@
 #!/usr/bin/env node
-require(__dirname + '/../lib')(process.argv[2] || 8080);
+require(__dirname + '/../lib')(process.argv[2] || 8080, process.argv[3] || 8090);

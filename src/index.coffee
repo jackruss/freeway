@@ -21,23 +21,30 @@ updateSettings = ->
     pin.emit 'settings:loaded'
     log 'Updated Settings from CouchDb.....'
 
-start = (port) ->
+start = (port, port2) ->
   # this may be buggy if settings are not set before bouncy is called.
-  server = bouncy opts, (req, bounce) =>
-    log "Req to bounce..."
-    xtoken = req?.headers['x-token']
+  
+  # INBOUND
+  thing1 = bouncy opts, (req, bounce) =>
     target = nconf.get('default') # set to default target
-    if xtoken? and nconf.get('tokens').indexOf(xtoken) >= 0 then target = req.headers?.host
 
     log "Bounced to #{target} on #{(new Date()).toString()}"
-    try
-      bounce target
-    catch err
-      log err.message
-      bounce 'http://google.com'
+    bounce target
 
-  server.on "error", (err) -> log err.message
-  server.listen port
+  thing1.on "error", (err) -> log err.message
+  thing1.listen port
+
+  # OUTBOUND
+  thing2 = bouncy (req, bounce) =>
+    target = 'https://www.google.com'
+    xtoken = req?.headers['x-token']
+    if xtoken? and nconf.get('tokens').indexOf(xtoken) >= 0 
+      target = req.headers?.host
+    log "Bounced to #{target} on #{(new Date()).toString()}"
+    bounce target
+
+  thing2.on "error", (err) -> log err.message
+  thing2.listen port2
 
 # follow changes
 follow { db: db }, (e, change) =>
@@ -58,7 +65,7 @@ pin.on 'getCERT', ->
     opts.cert = cert.toString()
     pin.emit 'LOADED', null
 
-module.exports = (port) ->
+module.exports = (port, port2) ->
   pin.once 'LOADED', (err) -> 
     log "Starting server on port #{port}..."
     start port
