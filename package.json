@@ -2,7 +2,7 @@
   "author": "Tom Wilson <tom@jackhq.com>",
   "name": "freeway",
   "description": "Reverse Proxy Server",
-  "version": "1.0.0-alpha6",
+  "version": "1.0.0-alpha7",
   "repository": {
     "url": "https://github.com/jackruss/freeway.git"
   },
@@ -20,13 +20,13 @@
     "nano": "~2.0.0",
     "nconf": "~0.5.1",
     "follow": "~0.8.0",
-    "linchpin": "~0.3.0"
+    "linchpin": "~0.3.0",
+    "request": "*"
   },
   "devDependencies": {
     "coffee-script": "*",
     "should": "*",
-    "mocha": "*",
-    "request": "*"
+    "mocha": "*"
   },
   "optionalDependencies": {},
   "homepage": "https://github.com/jackruss/freeway"

@@ -1,7 +1,9 @@
 log = console.log
 pin = require 'linchpin'
-bouncy = require 'bouncy'
+https = require 'https'
+http = require 'http'
 follow = require 'follow'
+request = require 'request'
 
 nconf = require 'nconf'
 nconf.env().file(file: "./config.json")
@@ -11,26 +13,33 @@ freeway = require('nano')(db)
 follow = require('follow')
 opts = {}
 
-updateSettings = ->
-  freeway.get 'settings', (e,settings) => 
-    return log e if e
-    for own k,v of settings
-      nconf.set(k, v) unless k[0] is '_' 
-    pin.emit 'settings:loaded'
-    log 'Updated Settings from CouchDb.....'
-
 start = (port) ->
-  # this may be buggy if settings are not set before bouncy is called.
-  server = bouncy opts, (req, bounce) =>
+  server = https.createServer opts, (req, res) =>
+  #server = http.createServer (req, res) =>
+    req.on 'error', (e) -> 
+      res.writeHead 500, 'content-type': 'text/plain'
+      res.end "Could not connect to #{target}"
+      log e.message
+    
+    method = req.method.toLowerCase()
     target = nconf.get('default') # set to default target
     xtoken = req?.headers['x-token']
     if xtoken? and nconf.get('tokens').indexOf(xtoken) >= 0 
       target = req.headers?.host
 
-    log "Bounced to #{target} on #{(new Date()).toString()}"
-    bounce target
+    dest = request[method](target + req.url)
+    dest.on 'error', (e) ->
+      msg = "ERROR: Could not connect to #{target} because #{e.message}"
+      log msg
+      res.writeHead 500, 'content-type': 'text/plain'
+      res.end msg
 
-  server.on "error", (err) -> log err.message
+    #bounce
+    log "Bounced to #{target} on #{(new Date()).toString()}"
+    req.pipe(dest.pipe(res))
+
+  server.on "error", (err) -> 
+    log err.message
   server.listen port
 
 # follow changes
@@ -38,6 +47,13 @@ follow { db: db }, (e, change) =>
   return log e if e
   updateSettings() if change.id == 'settings'
 
+updateSettings = ->
+  freeway.get 'settings', (e,settings) => 
+    return log e if e
+    for own k,v of settings
+      nconf.set(k, v) unless k[0] is '_' 
+    pin.emit 'settings:loaded'
+    log 'Updated Settings from CouchDb.....'
 
 pin.on 'getKEY', ->
   # setup certs
@@ -60,5 +76,5 @@ module.exports = (port) ->
   updateSettings()
   pin.once 'settings:loaded', ->
     pin.emit 'getKEY'
-    log 'Welcome to Freeway v 1.0.0alpha6'
+    log 'Welcome to Freeway v 1.0.0alpha7'
     log 'Initializing...'
