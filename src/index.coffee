@@ -27,7 +27,7 @@ start = (port) ->
     if xtoken? and nconf.get('tokens').indexOf(xtoken) >= 0 
       target = req.headers?.host
 
-    dest = request[method](target + req.url)
+    dest = request[method](target + req.url, headers: req.headers)
     dest.on 'error', (e) ->
       msg = "ERROR: Could not connect to #{target} because #{e.message}"
       log msg
