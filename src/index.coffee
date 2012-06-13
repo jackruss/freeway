@@ -31,8 +31,8 @@ start = (port) ->
     dest.on 'error', (e) ->
       msg = "ERROR: Could not connect to #{target} because #{e.message}"
       log msg
-      res.writeHead 500, 'content-type': 'text/plain'
-      res.end msg
+      #res.writeHead 500, 'content-type': 'text/plain'
+      #res.end msg
 
     #bounce
     log "Bounced to #{target} on #{(new Date()).toString()}"
