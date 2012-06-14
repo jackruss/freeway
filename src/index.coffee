@@ -20,14 +20,28 @@ start = (port) ->
       res.writeHead 500, 'content-type': 'text/plain'
       res.end "Could not connect to #{target}"
       log e.message
-    
+
     method = req.method.toLowerCase()
     target = nconf.get('default') # set to default target
     xtoken = req?.headers['x-token']
     if xtoken? and nconf.get('tokens').indexOf(xtoken) >= 0 
       target = req.headers?.host
 
-    dest = request[method](target + req.url, headers: req.headers)
+    headers = {}
+    for key, value of req.headers
+      headers[key] = value
+
+    headers['X-Forwarded-For']    = req.connection.address().address
+    headers['X-Forwarded-Host']   = target
+    headers['X-Forwarded-Server'] = target
+
+    dest = request
+      method: req.method
+      uri: target + req.url
+      headers: headers
+      jar: false
+      followRedirect: false
+
     dest.on 'error', (e) ->
       msg = "ERROR: Could not connect to #{target} because #{e.message}"
       log msg
@@ -36,10 +50,9 @@ start = (port) ->
 
     #bounce
     log "Bounced to #{target} on #{(new Date()).toString()}"
-    try
-      req.pipe(dest).pipe(res)
-    catch err
-      log err.message
+
+    req.pipe dest
+    dest.pipe res
 
   server.on "error", (err) -> 
     log err.message
