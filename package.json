@@ -2,7 +2,7 @@
   "author": "Tom Wilson <tom@jackhq.com>",
   "name": "freeway",
   "description": "Reverse Proxy Server",
-  "version": "1.0.0-alpha11",
+  "version": "1.0.0-alpha12",
   "repository": {
     "url": "https://github.com/jackruss/freeway.git"
   },
