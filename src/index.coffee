@@ -29,8 +29,7 @@ start = (port) ->
 
     headers = {}
     for key, value of req.headers
-      if key != 'host'
-        headers[key] = value
+      headers[key] = value if key != 'host'
 
     headers['X-Forwarded-For']    = req.connection.address().address
     headers['X-Forwarded-Host']   = target
