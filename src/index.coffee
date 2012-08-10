@@ -25,11 +25,10 @@ start = (port) ->
     target = nconf.get('default') # set to default target
     xtoken = req?.headers['x-token']
     if xtoken? and nconf.get('tokens').indexOf(xtoken) >= 0 
-      target = req.headers?.host
+      target = req.headers['x-target']
 
     headers = {}
-    for key, value of req.headers
-      headers[key] = value if key != 'host'
+    headers[key] = value for key, value of req.headers
 
     headers['X-Forwarded-For']    = req.connection.address().address
     headers['X-Forwarded-Host']   = target
