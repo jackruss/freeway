@@ -1,3 +1,4 @@
+[![build status](https://secure.travis-ci.org/jackruss/freeway.png)](http://travis-ci.org/jackruss/freeway)
 # Freeway
 
 A reverse proxy webserver
